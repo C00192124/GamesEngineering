@@ -1,0 +1,4 @@
+﻿  Source.cpp
+c:\users\gameuser\documents\visual studio 2017\projects\abstractpattern\abstractpattern\source.cpp(49): warning C4018: '<': signed/unsigned mismatch
+  AbstractPattern.vcxproj -> c:\users\gameuser\documents\visual studio 2017\Projects\AbstractPattern\Debug\AbstractPattern.exe
+  AbstractPattern.vcxproj -> c:\users\gameuser\documents\visual studio 2017\Projects\AbstractPattern\Debug\AbstractPattern.pdb (Partial PDB)
