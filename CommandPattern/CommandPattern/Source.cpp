@@ -4,6 +4,9 @@
 
 using namespace std;
 
+//Using a command pattern allows decoupling so that 
+//commands can be passed to multiple recievers
+//This also means that the invoker class is more reusable
 class Command {
 public:
 	virtual ~Command() {}
@@ -30,6 +33,7 @@ private:
 	Command* buttonY_ = new FireCommand();
 };
 
+//Handles all input before calling execute on the objects
 void InputHandler::handleInput(SDL_Event &event) {
 	if (event.key.keysym.sym == SDLK_x) buttonX_->execute();
 	else if (event.key.keysym.sym == SDLK_y) buttonY_->execute();
