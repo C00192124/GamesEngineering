@@ -10,6 +10,7 @@ public:
 	void addComponent(Component c) { components.push_back(c); }
 	void removeComponent(Component c) {}
 	std::vector<Component> getComponents() { return components; }
+	void update();
 private:
 	std::vector<Component> components;
 };
