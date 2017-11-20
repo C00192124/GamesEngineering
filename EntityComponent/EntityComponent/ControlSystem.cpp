@@ -6,6 +6,10 @@ void ControlSystem::update()
 	
 	for (int i = 0; i < entities.size(); i++)
 	{
-		entities.at(i).update();
+		std::vector<Component> vec = entities.at(i).getComponents();
+		for (int i = 0; i < vec.size(); i++)
+		{
+			std::cout << "Component" << std::endl;
+		}
 	}
 }

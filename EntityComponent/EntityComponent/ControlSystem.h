@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include "Entity.h"
+#include "Component.h"
 
 class ControlSystem
 {
