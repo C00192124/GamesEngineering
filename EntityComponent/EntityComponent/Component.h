@@ -1,5 +1,2 @@
 #pragma once
-class Component
-{
-
-};
+class Component{};

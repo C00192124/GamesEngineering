@@ -4,7 +4,6 @@
 
 class Entity
 {
-	int id;
 public:
 	Entity() {};
 	void addComponent(Component c) { components.push_back(c); }

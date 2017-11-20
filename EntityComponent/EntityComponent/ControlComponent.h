@@ -5,6 +5,7 @@ class ControlComponent : public Component
 {
 public:
 	ControlComponent() {}
+
 private:
 
 };
