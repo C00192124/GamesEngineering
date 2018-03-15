@@ -7,16 +7,34 @@ using namespace std;
 
 struct Semaphore
 {
-	int mutexReader = 1, mutexDB = 1;
+public:
+	//Try
+	void P()
+	{
+		while (m_lock <= 0)
+		{
+			cout << "waiting..." << endl;
+		}
+		m_lock -= 1;
+	}
+
+	//Increment
+	void V()
+	{
+		m_lock += 1;
+	}
+
+private:
+	int m_lock = 1;
 };
 
 void Reader();
 void Writer();
 
-void P(int &x);
-void V(int &x);
-
-Semaphore semaphore;
+//lock for reader
+Semaphore readerSem;
+//lock for db
+Semaphore dbSem;
 
 int readerCount = 0;
 
@@ -29,22 +47,6 @@ void main()
 	tWriter.join();
 }
 
-//Try
-void P(int &x)
-{
-	while (x <= 0)
-	{
-		cout << "waiting..." << endl;
-	}
-	x -= 1;
-}
-
-//Increment
-void V(int &x)
-{
-	x += 1;
-}
-
 void Reader()
 {
 	bool running = true;
@@ -52,23 +54,23 @@ void Reader()
 	{
 		cout << this_thread::get_id() << endl;
 		this_thread::sleep_for(chrono::seconds(1));
-		P(semaphore.mutexReader);
+		readerSem.P();
 		readerCount += 1;
 		if (readerCount == 1)
 		{
-			P(semaphore.mutexDB);
+			dbSem.P();
 		}
-		V(semaphore.mutexReader);
+		readerSem.V();
 		
 		cout << "Reading..." << endl;
 		
-		P(semaphore.mutexReader);
+		readerSem.P();
 		readerCount -= 1;
 		if (readerCount == 0)
 		{
-			V(semaphore.mutexDB);
+			dbSem.V();
 		}
-		V(semaphore.mutexReader);
+		readerSem.V();
 	}
 }
 void Writer()
@@ -78,10 +80,10 @@ void Writer()
 	{
 		cout << this_thread::get_id() << endl;
 		this_thread::sleep_for(chrono::seconds(1));
-		P(semaphore.mutexDB);
+		dbSem.P();
 		
 		cout << "Writing..." << endl;
 
-		V(semaphore.mutexDB);
+		dbSem.V();
 	}
 }
