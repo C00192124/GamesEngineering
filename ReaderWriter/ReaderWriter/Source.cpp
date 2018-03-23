@@ -2,34 +2,25 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <string>
+#include <mutex>
+#include <condition_variable>
 
 using namespace std;
 
 struct Semaphore
 {
 public:
-	//Try
-	void P()
-	{
-		while (m_lock <= 0)
-		{
-			cout << "waiting..." << endl;
-		}
-		m_lock -= 1;
-	}
-
-	//Increment
-	void V()
-	{
-		m_lock += 1;
-	}
-
-private:
 	int m_lock = 1;
+	mutex m_mutex;
+	condition_variable m_con;
 };
 
 void Reader();
 void Writer();
+
+void P(Semaphore &s);
+void V(Semaphore &s);
 
 //lock for reader
 Semaphore readerSem;
@@ -43,8 +34,15 @@ void main()
 	thread tReader(Reader);
 	thread tWriter(Writer);
 
+	thread tReader2(Reader);
+	thread tWriter2(Writer);
+
 	tReader.join();
 	tWriter.join();
+
+	tReader2.join();
+	tWriter2.join();
+
 }
 
 void Reader()
@@ -52,25 +50,25 @@ void Reader()
 	bool running = true;
 	while (running)
 	{
-		cout << this_thread::get_id() << endl;
-		this_thread::sleep_for(chrono::seconds(1));
-		readerSem.P();
+		P(readerSem);
 		readerCount += 1;
 		if (readerCount == 1)
 		{
-			dbSem.P();
+			cout << "reading..." << endl;
+			P(dbSem);
 		}
-		readerSem.V();
+		V(readerSem);
 		
-		cout << "Reading..." << endl;
-		
-		readerSem.P();
+		P(readerSem);
 		readerCount -= 1;
 		if (readerCount == 0)
 		{
-			dbSem.V();
+			cout << "reader finished" << endl;
+			V(dbSem);
 		}
-		readerSem.V();
+		V(readerSem);
+
+		this_thread::sleep_for(chrono::seconds(1));
 	}
 }
 void Writer()
@@ -78,12 +76,33 @@ void Writer()
 	bool running = true;
 	while (running)
 	{
-		cout << this_thread::get_id() << endl;
-		this_thread::sleep_for(chrono::seconds(1));
-		dbSem.P();
 		
-		cout << "Writing..." << endl;
+		P(dbSem);
+		
+		cout << "writing..." << endl;
+		cout << "writer finished" << endl;
 
-		dbSem.V();
+		V(dbSem);
+
+		this_thread::sleep_for(chrono::seconds(1));
 	}
+}
+
+//Try
+void P(Semaphore &s)
+{
+	unique_lock<mutex> lock(s.m_mutex);
+	while (s.m_lock <= 0)
+	{
+		s.m_con.wait(lock);
+	}
+	s.m_lock -= 1;
+}
+
+//Increment
+void V(Semaphore &s)
+{
+	unique_lock<mutex> lock(s.m_mutex);
+	s.m_lock += 1;
+	s.m_con.notify_one();
 }
